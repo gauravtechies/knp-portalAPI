@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       },
      companyName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       email: {
         type: DataTypes.STRING,
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   user.prototype.validatePassword = function (password) {
-    return Promise.resolve(bcrypt.compareSync(password, this.passwordHash));
+    return Promise.resolve(bcrypt.compareSync(password, this.password));
   };
   user.associate = function (models) {
     user.belongsTo(models.roles, {foreignKey: {allowNull:false,defaultValue:3}, sourceKey: 'id', constraints: false });
