@@ -1,9 +1,6 @@
 'use strict'
 
 
-
-
-
 const errorTypes = {
   validation: 'validation',
   unAuthorized: 'UnAuthorized',
@@ -31,10 +28,12 @@ const params = {
   email: 'email',
   password: 'password',
   roleId:'roleId',
-  jobTitle:'jobTitle',
-  jobDescription:'jobDescription',
+  jobName:'jobName',
+  description:'description',
   userId:'userId',
-  hrId:'hrId'
+  hrId:'hrId',
+  clientId:"clientId",
+  note:"note"
 };
 
 
