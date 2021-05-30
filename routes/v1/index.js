@@ -10,7 +10,10 @@ module.exports = (db, logger) => {
   });
 
 
-  router.use('/', require('./clients')(db, logger));
+  router.use('/client', require('./clients')(db, logger));
   router.use('/admin', require('./admin')(db, logger));
+  router.use('/hr', require('./hrjobsFetch')(db, logger));
+  router.use('/',require('./refreshToken')(db, logger));
   return router;
+
 };

@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   user.associate = function (models) {
     user.belongsTo(models.roles, {foreignKey: {allowNull:false,defaultValue:3}, sourceKey: 'id', constraints: false });
-    user.hasMany(models.jobs);
+   
     
     
   };
