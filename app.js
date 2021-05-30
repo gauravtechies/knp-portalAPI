@@ -3,9 +3,12 @@ const http = require('http');
 const debug = require('debug')('api:server');
 const createError = require('http-errors');
 const express = require('express');
+const cors = require('cors')
 const path = require('path');
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
+const logger = require('pino')();
 
 function reqSerializer(req) {
   return {
@@ -15,24 +18,8 @@ function reqSerializer(req) {
   };
 }
 
-const bunyan = require('bunyan');
-
-// const configPath = path.join(__dirname, './config/db.config');
-// eslint-disable-next-line import/no-dynamic-require
-
-const logger = bunyan.createLogger({
-  name: 'ijura-api',
-  streams: [{
-    stream: process.stdout,
-    level: 'debug',
-  }],
-  serializers: {
-    req: reqSerializer,
-  },
-});
-
 const app = express();
-
+app.use(cors())
 let apiVersion = null;
 
 try {
@@ -41,7 +28,7 @@ try {
 } catch (e) {
   apiVersion = 'Unavailable';
 }
-
+app.use(bodyParser.json());
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -75,7 +62,6 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-
 /**
  * Event listener for HTTP server "error" event.
  */
@@ -85,9 +71,7 @@ function onError(error) {
     throw error;
   }
 
-  const bind = typeof port === 'string'
-    ? `Pipe ${port}`
-    : `Port ${port}`;
+  const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -110,10 +94,9 @@ function onError(error) {
 
 function onListening() {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-    ? `pipe  ${addr}`
-    : `port  ${addr.port}`;
-  debug(`Listening on ${bind}`);
+  const bind =
+    typeof addr === 'string' ? `pipe  ${addr}` : `port  ${addr.port}`;
+  console.log(`Listening on ${bind}`);
 }
 
 /**
@@ -126,9 +109,9 @@ server.on('listening', onListening);
 
 const db = require('./models');
 
+const authRoute = require('./auth')(db, logger);
 
 const v1Routes = require('./routes/v1')(db, logger);
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -145,18 +128,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 app.all('*', (req, res, next) => {
   res.header('X-Api-Server-Version', apiVersion);
   res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Origin,Accept');
-  res.header('Access-Control-Expose-Headers', 'X-Result-Page-Limit, X-Result-Page-Size, X-Result-Start-Offset, X-Result-Total-Count, X-Result-Job-Id');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,Content-Type,Origin,Accept'
+  );
+  res.header(
+    'Access-Control-Expose-Headers',
+    'X-Result-Page-Limit, X-Result-Page-Size, X-Result-Start-Offset, X-Result-Total-Count, X-Result-Job-Id'
+  );
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
   res.header('Access-Control-Allow-Credentials', true);
   next();
 });
 
+app.get('/healthcheck', (req, res) => {
+  res.send('👍');
+});
 
+app.use(authRoute);
 app.use('/v1', v1Routes);
 
 // catch 404 and forward to error handler
@@ -170,10 +162,10 @@ app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+  logger.error(err);
   // render the error page
   res.status(err.status || 500);
-  res.json({ errors: err.errors });
+  res.json({ errors: err.message });
 });
 
 module.exports = app;

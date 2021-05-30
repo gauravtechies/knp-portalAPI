@@ -29,7 +29,7 @@ const userDesc = {
     ChildOnePmp: 'Please enter a valid Child table ID',
     masterOnePmpNotFound: "Master OnePMP not found.",
     share: "Please provide a valid value.",
-    emailAlreadyExist:"Email address already exist",
+   
     limit: 'Please provide a number for limit',
     offset: 'Please provide a number for offset',
     isVerified: 'Please provide a boolean value.',
@@ -42,7 +42,10 @@ const userDesc = {
     accountNotFound:"Account not found",
     oldPassword:'Please fill your old password',
     cantSame: 'Your old and new password cannot be same',
-    pmpSectionCannotBeEmpty: 'This section cannot be empty'
+    pmpSectionCannotBeEmpty: 'This section cannot be empty',
+
+    companyNameEmpty:"CompanyNameIsEmpty",
+    emailAlreadyExist:"Email address already exist",
   };
   
   module.exports = userDesc;

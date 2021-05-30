@@ -2,6 +2,7 @@
 const express = require('express');
 
 const router = express.Router();
+const passport = require('passport');
 
 module.exports = (db, logger) => {
   router.get('/', (req, res) => {
@@ -9,6 +10,7 @@ module.exports = (db, logger) => {
   });
 
 
-  router.use('/users', require('./users')(db, logger));
+  router.use('/', require('./clients')(db, logger));
+  router.use('/admin', require('./admin')(db, logger));
   return router;
 };
