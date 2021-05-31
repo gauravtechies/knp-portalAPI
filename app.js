@@ -1,6 +1,5 @@
 require('dotenv').config();
 const http = require('http');
-const debug = require('debug')('api:server');
 const createError = require('http-errors');
 const express = require('express');
 const cors = require('cors')
@@ -158,14 +157,6 @@ app.use((req, res, next) => {
 
 // error handler
 // eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  logger.error(err);
-  // render the error page
-  res.status(err.status || 500);
-  res.json({ errors: err.message });
-});
+
 
 module.exports = app;
